@@ -16,7 +16,7 @@ import { ComponentManager } from "@sygnal/sse-core";
 import type { SiteGlobalData } from "./types";
 
 // Global vars
-const SITE_NAME = 'Site';
+const SITE_NAME = 'FeedSpring';
 
 // Extend the Window interface to include globals
 // as a TypeScript accessibility convenience

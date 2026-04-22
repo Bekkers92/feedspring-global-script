@@ -1,7 +1,7 @@
 {
-  "name": "webflow-site-engine",
+  "name": "feedspring-site-engine",
   "version": "0.1.2",
-  "description": "",
+  "description": "SSE site package for FeedSpring Webflow custom code.",
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -13,11 +13,11 @@
     "generate:routes": "node generate-imports.js",
     "typecheck": "tsc --noEmit",
     "format": "prettier src/**/*.{ts,scss} -w",
-    "clean": "rm -rf dist"
+    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\""
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sygnaltech/webflow-dev-template.git"
+    "url": ""
   },
   "author": {
     "name": "Michael Wells",
@@ -26,9 +26,9 @@
   },
   "license": "",
   "bugs": {
-    "url": "https://github.com/sygnaltech/webflow-dev-template/issues"
+    "url": ""
   },
-  "homepage": "https://github.com/sygnaltech/webflow-dev-template#readme",
+  "homepage": "",
   "devDependencies": {
     "esbuild": "^0.15.14",
     "prettier": "^2.7.1",
