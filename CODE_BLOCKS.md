@@ -24,6 +24,12 @@ Quick reference for custom Webflow code that has been moved into this SSE repo.
 - Purpose: controls custom smooth tab buttons, syncs them to hidden Webflow tab links, moves the sliding indicator, and injects the home-only tab styles.
 - Original Webflow location: home page custom code.
 
+### Blog Tabs Controller
+- File: `src/pages/blog.ts`
+- Runs on: `/blog`
+- Purpose: controls custom blog tab buttons, syncs them to hidden Webflow tab links, moves the sliding indicator, and injects the blog-only tab styles.
+- Original Webflow location: blog page custom code.
+
 ### Pricing Count Up
 - File: `src/pages/pricing.ts`
 - Runs on: `/pricing`
@@ -60,6 +66,7 @@ Page files only run when they are imported in `src/registry.ts` and decorated wi
 
 Current active page imports:
 - `src/pages/home.ts`
+- `src/pages/blog.ts`
 - `src/pages/components.ts`
 - `src/pages/pricing.ts`
 - `src/pages/valet.ts`
