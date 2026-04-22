@@ -27,6 +27,7 @@ import { Site } from "./site";
 // PAGES - Import all pages to trigger @page decorator
 // ============================================================
 import "./pages/home";
+import "./pages/components";
 import "./pages/pricing";
 import "./pages/valet";
 // Add more page imports here as you create them

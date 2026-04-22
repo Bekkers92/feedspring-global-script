@@ -1,6 +1,7 @@
 
 /*
  * Site
+ * Global FeedSpring behaviors that should run across the Webflow site.
  */
 
 import { IModule } from "@sygnal/sse-core";
@@ -11,6 +12,8 @@ type LenisInstance = {
   raf: (time: number) => void;
 };
 
+// Lenis is loaded from the pinned CDN URL below, so we define the tiny piece
+// of its browser API that this project uses instead of importing a package.
 type LenisConstructor = new (options: {
   wrapper: HTMLElement | null;
   content: HTMLElement | null;
@@ -49,11 +52,13 @@ export class Site implements IModule {
    * Exec code runs after the DOM has processed. 
    */
   exec() {
+    // Site-level DOM behavior belongs here; page-specific code stays in src/pages.
     this.initLenisSmoothScroll();
     this.initColorNav();
   }
 
   private initLenisSmoothScroll(): void {
+    // Load Lenis once, then hand it the Webflow body wrapper used by this site.
     this.loadScript(LENIS_CDN_URL)
       .then(() => {
         if (!window.Lenis) return;
@@ -68,6 +73,7 @@ export class Site implements IModule {
           smoothWheel: true,
         });
 
+        // Lenis needs a requestAnimationFrame loop to drive smooth scrolling.
         const raf = (time: number) => {
           lenis.raf(time);
           requestAnimationFrame(raf);
@@ -81,6 +87,7 @@ export class Site implements IModule {
   }
 
   private initColorNav(): void {
+    // When Webflow opens the mobile nav, add a temporary fade background to the nav bar.
     const btn = document.querySelector(".nav_menu-button.w-nav-button");
     const nav = document.querySelector<HTMLElement>(".nav_bar");
 
@@ -98,6 +105,7 @@ export class Site implements IModule {
   }
 
   private loadScript(src: string): Promise<void> {
+    // Reuse an existing script tag if Webflow or another module already loaded this source.
     const existingScript = document.querySelector<HTMLScriptElement>(`script[src="${src}"]`);
 
     if (existingScript) {
