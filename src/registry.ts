@@ -31,6 +31,7 @@ import "./pages/blog";
 import "./pages/components";
 import "./pages/pricing";
 import "./pages/valet";
+import "./pages/platform-webflow";
 // Add more page imports here as you create them
 
 // ============================================================
