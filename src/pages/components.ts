@@ -1,9 +1,16 @@
 /**
  * Page | Components
- * Search shortcut, platform label, and grid toggle behavior for the components library page.
+ * Search shortcut, filter counters, platform label, and grid toggle behavior for the components library page.
  */
 
 import { PageBase, page } from "@sygnal/sse-core";
+
+type FilterCounterConfig = {
+  key: string;
+  label: string;
+  countTargetSelectors: string[];
+  scopeSelectors: string[];
+};
 
 const PLATFORM_LABELS: Record<string, string> = {
   "ai-agents": "AI Agents",
@@ -12,7 +19,52 @@ const PLATFORM_LABELS: Record<string, string> = {
   html: "HTML",
 };
 
-@page('/components')
+const FILTER_COUNTERS: FilterCounterConfig[] = [
+  {
+    key: "platform",
+    label: "Platform",
+    countTargetSelectors: [
+      '#fs-platform-count',
+      '[fs-filter-count="platform"]',
+      '[data-filter-count="platform"]',
+    ],
+    scopeSelectors: [
+      '[fs-filter-group="platform"]',
+      '[data-filter-group="platform"]',
+      '[fb-filter-group="platform"]',
+    ],
+  },
+  {
+    key: "feeds",
+    label: "Feeds",
+    countTargetSelectors: [
+      '#fs-feeds-count',
+      '[fs-filter-count="feeds"]',
+      '[data-filter-count="feeds"]',
+    ],
+    scopeSelectors: [
+      '[fs-filter-group="feeds"]',
+      '[data-filter-group="feeds"]',
+      '[fb-filter-group="feeds"]',
+    ],
+  },
+  {
+    key: "tags",
+    label: "Tags",
+    countTargetSelectors: [
+      '#fs-tags-count',
+      '[fs-filter-count="tags"]',
+      '[data-filter-count="tags"]',
+    ],
+    scopeSelectors: [
+      '[fs-filter-group="tags"]',
+      '[data-filter-group="tags"]',
+      '[fb-filter-group="tags"]',
+    ],
+  },
+];
+
+@page('/product/components')
 export class ComponentsPage extends PageBase {
 
   protected onPrepare(): void {
@@ -20,6 +72,7 @@ export class ComponentsPage extends PageBase {
 
   protected async onLoad(): Promise<void> {
     this.initSearchShortcut();
+    this.initFilterCounters();
     this.initPlatformLabel();
     this.initGridToggle();
   }
@@ -37,6 +90,85 @@ export class ComponentsPage extends PageBase {
       searchInput.focus();
       searchInput.select();
     });
+  }
+
+  private initFilterCounters(): void {
+    const updateFilterCounters = () => {
+      FILTER_COUNTERS.forEach((config) => {
+        this.updateFilterCounter(config);
+      });
+    };
+
+    updateFilterCounters();
+    document.addEventListener("click", () => window.setTimeout(updateFilterCounters, 50));
+    document.addEventListener("change", () => window.setTimeout(updateFilterCounters, 50));
+    window.addEventListener("popstate", updateFilterCounters);
+
+    const observer = new MutationObserver(updateFilterCounters);
+    observer.observe(document.body, {
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+  }
+
+  private updateFilterCounter(config: FilterCounterConfig): void {
+    const scope = this.getFilterCounterScope(config);
+    const target = this.getFilterCounterTarget(config, scope);
+    if (!scope || !target) return;
+
+    const activeCount = scope.querySelectorAll(
+      ".jetboost-filter-trigger.jetboost-filter-active"
+    ).length;
+
+    target.textContent = activeCount > 0 ? `(${activeCount})` : "";
+    target.setAttribute("aria-label", `${activeCount} ${config.label} filters selected`);
+  }
+
+  private getFilterCounterScope(config: FilterCounterConfig): HTMLElement | null {
+    for (const selector of config.scopeSelectors) {
+      const scope = document.querySelector<HTMLElement>(selector);
+      if (scope) return scope;
+    }
+
+    return this.getDropdownByLabel(config.label);
+  }
+
+  private getFilterCounterTarget(
+    config: FilterCounterConfig,
+    scope: HTMLElement | null
+  ): HTMLElement | null {
+    for (const selector of config.countTargetSelectors) {
+      const target = document.querySelector<HTMLElement>(selector);
+      if (target) return target;
+    }
+
+    const dropdown = scope?.closest<HTMLElement>(".w-dropdown") ?? this.getDropdownByLabel(config.label);
+    const toggle = dropdown?.querySelector<HTMLElement>(".w-dropdown-toggle");
+    if (!toggle) return null;
+
+    let target = toggle.querySelector<HTMLElement>(`[fs-filter-count="${config.key}"]`);
+    if (target) return target;
+
+    target = document.createElement("span");
+    target.className = "fs-filter-count";
+    target.setAttribute("fs-filter-count", config.key);
+    target.setAttribute("aria-live", "polite");
+
+    toggle.appendChild(target);
+    return target;
+  }
+
+  private getDropdownByLabel(label: string): HTMLElement | null {
+    const dropdowns = Array.from(document.querySelectorAll<HTMLElement>(".w-dropdown"));
+    const normalizedLabel = label.toLowerCase();
+
+    return dropdowns.find((dropdown) => {
+      const toggle = dropdown.querySelector<HTMLElement>(".w-dropdown-toggle");
+      if (!toggle) return false;
+
+      return (toggle.textContent ?? "").trim().toLowerCase().includes(normalizedLabel);
+    }) ?? null;
   }
 
   private initPlatformLabel(): void {
