@@ -32,6 +32,7 @@ import "./pages/components";
 import "./pages/pricing";
 import "./pages/valet";
 import "./pages/platform-webflow";
+import "./pages/tour";
 // Add more page imports here as you create them
 
 // ============================================================
