@@ -19,6 +19,8 @@ const PLATFORM_LABELS: Record<string, string> = {
   html: "HTML",
 };
 
+const FILTER_COUNTER_TARGET_SELECTOR = '[fs-component-filter="target"], #fs-component-filter';
+
 const FILTER_COUNTERS: FilterCounterConfig[] = [
   {
     key: "platform",
@@ -122,6 +124,7 @@ export class ComponentsPage extends PageBase {
     ).length;
 
     target.textContent = activeCount > 0 ? `(${activeCount})` : "";
+    target.style.display = activeCount > 0 ? "" : "none";
     target.setAttribute("aria-label", `${activeCount} ${config.label} filters selected`);
   }
 
@@ -138,14 +141,17 @@ export class ComponentsPage extends PageBase {
     config: FilterCounterConfig,
     scope: HTMLElement | null
   ): HTMLElement | null {
-    for (const selector of config.countTargetSelectors) {
-      const target = document.querySelector<HTMLElement>(selector);
-      if (target) return target;
-    }
-
     const dropdown = scope?.closest<HTMLElement>(".w-dropdown") ?? this.getDropdownByLabel(config.label);
     const toggle = dropdown?.querySelector<HTMLElement>(".w-dropdown-toggle");
     if (!toggle) return null;
+
+    const sharedTarget = toggle.querySelector<HTMLElement>(FILTER_COUNTER_TARGET_SELECTOR);
+    if (sharedTarget) return sharedTarget;
+
+    for (const selector of config.countTargetSelectors) {
+      const target = toggle.querySelector<HTMLElement>(selector);
+      if (target) return target;
+    }
 
     let target = toggle.querySelector<HTMLElement>(`[fs-filter-count="${config.key}"]`);
     if (target) return target;
@@ -155,7 +161,13 @@ export class ComponentsPage extends PageBase {
     target.setAttribute("fs-filter-count", config.key);
     target.setAttribute("aria-live", "polite");
 
-    toggle.appendChild(target);
+    const arrow = toggle.querySelector<HTMLElement>(".w-icon-dropdown-toggle, .icon-small");
+    if (arrow) {
+      toggle.insertBefore(target, arrow);
+    } else {
+      toggle.appendChild(target);
+    }
+
     return target;
   }
 
