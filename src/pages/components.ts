@@ -172,7 +172,11 @@ export class ComponentsPage extends PageBase {
   }
 
   private getDropdownByLabel(label: string): HTMLElement | null {
-    const dropdowns = Array.from(document.querySelectorAll<HTMLElement>(".w-dropdown"));
+    const preferredDropdowns = Array.from(
+      document.querySelectorAll<HTMLElement>(".components_filter-bar .w-dropdown, .component_dropdown.w-dropdown")
+    );
+    const fallbackDropdowns = Array.from(document.querySelectorAll<HTMLElement>(".w-dropdown"));
+    const dropdowns = [...preferredDropdowns, ...fallbackDropdowns];
     const normalizedLabel = label.toLowerCase();
 
     return dropdowns.find((dropdown) => {
